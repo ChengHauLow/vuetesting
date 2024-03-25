@@ -7,13 +7,13 @@
       <el-table :data="list" style="width:100%" border>
         <el-table-column align="center" prop="name" label="Name" width="120px">
           <template slot-scope="scope">
-            <el-button size="normal" type="primary" @click="toggleMyInfo(scope.row.name, 2)">{{ scope.row.name }}</el-button>
+            <el-button size="normal" type="primary" @click="toggleMyInfo(scope.row, 2)">{{ scope.row.name }}</el-button>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="phone" label="Phone" width="120px"></el-table-column>
         <el-table-column align="center" prop="address" label="Address" width="120px">
           <template slot-scope="scope">
-            <el-button size="normal" type="default" @click="toggleMyInfo(scope.row.address, 1)">{{ scope.row.address }}</el-button>
+            <el-button size="normal" type="default" @click="toggleMyInfo(scope.row, 1)">{{ scope.row.address }}</el-button>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="is_active" label="Is Active?" width="120px">
@@ -23,7 +23,7 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <MyInfo :uservisible.sync="dialog.dialogVisible" @myinfoclose="toggleMyInfo" :data.sync="dialog.dialogData" size="small"/>
+    <MyInfo :popUpTitle="title" :uservisible.sync="dialog.dialogVisible" @myinfoclose="toggleMyInfo" :data.sync="dialog.dialogData" size="small"/>
   </div>
 </template>
 
@@ -76,13 +76,12 @@ export default {
       this.dialog.dialogData = {
         type
       }
-      if(type == 2){
-        this.dialog.dialogData.name = e
-      }else{
-        this.dialog.dialogData.address = e
-      }
+      this.dialog.dialogData.row = e
       this.dialog.dialogVisible = !this.dialog.dialogVisible
     }
+  },
+  mounted(){
+    document.title = this.title
   }
 }
 </script>

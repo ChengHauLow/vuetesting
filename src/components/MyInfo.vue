@@ -1,37 +1,45 @@
 <template>
     <el-dialog
-    title="Tips"
+    :title="popUpTitle"
     :visible="uservisible"
     :before-close="handlecloseclick"
     :overflow="false"
     :close-on-click-modal="false"
     width="65%"
     @open="open">
-        <span v-if="myData.type && myData.type == 1">{{ myData.address }}</span>
-        <span v-else>{{ myData.name }}</span>
-        <span slot="footer" class="dialog-footer">
+        <el-table :data="myData" style="width:100%" border>
+          <el-table-column align="center" prop="name" label="Name" width="220px"></el-table-column>
+          <el-table-column align="center" prop="phone" label="Phone" width="220px"></el-table-column>
+          <el-table-column align="center" prop="address" label="Address" width=""></el-table-column>
+          <el-table-column align="center" prop="is_active" label="Is Active?" width="120px">
+            <template slot-scope="scope">
+              <span :class="{'active':scope.row.is_active}">{{ scope.row.is_active?'Active':'InActive' }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- <span slot="footer" class="dialog-footer">
             <el-button @click="handleCancel">Cancel</el-button>
             <el-button type="primary" @click="handlecloseclick">Confirm</el-button>
-        </span>
+        </span> -->
     </el-dialog>
 </template>
 <script>
 export default {
   name: 'MainPage',
   props: {
-    title: String,
     uservisible:Boolean,
-    data: Object
+    data: Object,
+    popUpTitle: String
   },
   data(){
     return{
-        myData:{}
+        myData:{},
+        title:''
     }
   },
   methods:{
     open(){
-        this.myData = this.data
-        // console.log(this.myData)
+        this.myData = [this.data.row]
     },
     handlecloseclick(){
         // console.log(this.data)

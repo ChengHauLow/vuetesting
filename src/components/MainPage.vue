@@ -24,6 +24,13 @@
       </el-table>
     </el-card>
     <MyInfo :popUpTitle="title" :uservisible.sync="dialog.dialogVisible" @myinfoclose="toggleMyInfo" :data.sync="dialog.dialogData" size="small"/>
+    <form :model="form" @submit.prevent="sendMessage" id="sendMymsg">
+      <label for="msg">What Message:</label>
+      <input type="text" v-model="form.msg" name="msg" id="msg">
+      <input type="submit" value="Send Now">
+    </form>
+    <h1>Response from server:</h1>
+    <p>{{ this.serverMsg }}</p>
   </div>
 </template>
 
@@ -68,7 +75,12 @@ export default {
       dialog:{
         dialogVisible: false,
         dialogData:{}
-      }
+      },
+      form:{
+        msg:'',
+      },
+      serverMsg:'No Message',
+      connection: null
     }
   },
   methods:{
@@ -78,6 +90,56 @@ export default {
       }
       this.dialog.dialogData.row = e
       this.dialog.dialogVisible = !this.dialog.dialogVisible
+    },
+    sendMessage(e){
+      e.preventDefault()
+      console.log(this.connection);
+      // console.log(this.form.msg)
+      this.connection.send(this.form.msg);
+    },
+    getServerMsg(msg){
+      this.serverMsg = msg
+    }
+  },
+  created(){
+    let self = this
+    console.log("Starting Connection to Websocket Server")
+    this.connection = new WebSocket("ws://localhost:3030")
+
+    this.connection.onopen = function(event){
+      console.log(event);
+      console.log("Successfully connected to websocket server...")
+    }
+
+    this.connection.onmessage = function(event){
+      console.log(`Server response a message of`, event.data)
+      self.serverMsg = 'Typing'
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },300)
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },600)
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },900)
+      setTimeout(()=>{
+        self.serverMsg = 'Typing'
+      },1500)
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },1800)
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },2100)
+      setTimeout(()=>{
+        self.serverMsg += '.'
+      },2400)
+      setTimeout(()=>{
+        self.serverMsg = JSON.parse(event.data).message
+      },2700)
+      
+      console.log(self.serverMsg)
     }
   },
   mounted(){

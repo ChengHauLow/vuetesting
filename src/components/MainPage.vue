@@ -82,7 +82,7 @@ export default {
       form:{
         msg:'',
       },
-      serverMsg:[],
+      serverMsg:'No Message',
       connection: null
     }
   },
@@ -111,6 +111,9 @@ export default {
       }
       this.connection.send(JSON.stringify(["home_index", param]));
     },
+    getServerMsg(msg){
+      this.serverMsg = msg
+    }
   },
   created(){
     let self = this
@@ -125,7 +128,7 @@ export default {
     }
 
     this.connection.onmessage = function(event){
-      console.log(`Server response a message of`, event.data)
+      console.log(event.data)
       // self.serverMsg = 'Typing'
       // setTimeout(()=>{
       //   self.serverMsg += '.'

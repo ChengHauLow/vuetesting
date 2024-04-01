@@ -24,18 +24,15 @@
       </el-table>
     </el-card>
     <MyInfo :popUpTitle="title" :uservisible.sync="dialog.dialogVisible" @myinfoclose="toggleMyInfo" :data.sync="dialog.dialogData" size="small"/>
-    <form :model="form" @submit.prevent="sendMessage" id="sendMymsg">
+    <!-- <form :model="form" @submit.prevent="sendMessage" id="sendMymsg">
       <label for="msg">What Message:</label>
       <input type="text" v-model="form.msg" name="msg" id="msg">
       <input type="submit" value="Send Now">
-    </form>
+    </form>-->
     <h1>Response from server:</h1>
-    <template v-if="serverMsg.length > 0">
-      <p v-for="(msg, key) in serverMsg" :key="key">{{ msg }}</p>
-    </template>
-    <template v-else>
-      <p>No Message</p>
-    </template>
+    <p v-if="user?.user">{{ user.user }}</p> 
+    <p v-if="user?.pw">{{ user.pw }}</p> 
+    <p v-if="serverMsg != ''">{{ serverMsg }}</p> 
   </div>
 </template>
 
@@ -81,6 +78,7 @@ export default {
         dialogVisible: false,
         dialogData:{}
       },
+      user:null,
       form:{
         msg:'',
       },
@@ -96,19 +94,22 @@ export default {
       this.dialog.dialogData.row = e
       this.dialog.dialogVisible = !this.dialog.dialogVisible
     },
-    sendMessage(e){
-      e.preventDefault()
+    sendMessage(){
+      // e.preventDefault()
       console.log(this.connection);
       // console.log(this.form.msg)
-      if(this.form.msg != ''){
-        this.connection.send(this.form.msg);
-        this.form.msg = '';
+      let param = {
+        name: "LOW",
+        pw:'123456'
       }
-      else{
-        alert('Message content is required!')
-        this.form.msg = '';
-        return;
+      this.connection.send(JSON.stringify(["main_index", param]));
+    },
+    setTitle(){
+      console.log(this.connection);
+      let param = {
+        type: 1,
       }
+      this.connection.send(JSON.stringify(["home_index", param]));
     },
   },
   created(){
@@ -119,6 +120,8 @@ export default {
     this.connection.onopen = function(event){
       console.log(event);
       console.log("Successfully connected to websocket server...")
+      self.sendMessage();
+      self.setTitle();
     }
 
     this.connection.onmessage = function(event){
@@ -148,9 +151,16 @@ export default {
       // setTimeout(()=>{
       //   self.serverMsg = JSON.parse(event.data).message
       // },2700)
-      self.serverMsg.push(JSON.parse(event.data).message)
       
-      console.log(self.serverMsg)
+      // console.log(self.serverMsg)
+      let dataFromSocket = JSON.parse(event.data); 
+      if(dataFromSocket.type == 1){
+        self.user = dataFromSocket
+      }else if(dataFromSocket.type == 2){
+        self.title = dataFromSocket.title
+        self.serverMsg = dataFromSocket.servermsg
+      }
+      console.log(self.user)
     }
   },
   mounted(){

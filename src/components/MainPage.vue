@@ -30,7 +30,12 @@
       <input type="submit" value="Send Now">
     </form>
     <h1>Response from server:</h1>
-    <p>{{ this.serverMsg }}</p>
+    <template v-if="serverMsg.length > 0">
+      <p v-for="(msg, key) in serverMsg" :key="key">{{ msg }}</p>
+    </template>
+    <template v-else>
+      <p>No Message</p>
+    </template>
   </div>
 </template>
 
@@ -79,7 +84,7 @@ export default {
       form:{
         msg:'',
       },
-      serverMsg:'No Message',
+      serverMsg:[],
       connection: null
     }
   },
@@ -95,11 +100,16 @@ export default {
       e.preventDefault()
       console.log(this.connection);
       // console.log(this.form.msg)
-      this.connection.send(this.form.msg);
+      if(this.form.msg != ''){
+        this.connection.send(this.form.msg);
+        this.form.msg = '';
+      }
+      else{
+        alert('Message content is required!')
+        this.form.msg = '';
+        return;
+      }
     },
-    getServerMsg(msg){
-      this.serverMsg = msg
-    }
   },
   created(){
     let self = this
@@ -113,31 +123,32 @@ export default {
 
     this.connection.onmessage = function(event){
       console.log(`Server response a message of`, event.data)
-      self.serverMsg = 'Typing'
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },300)
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },600)
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },900)
-      setTimeout(()=>{
-        self.serverMsg = 'Typing'
-      },1500)
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },1800)
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },2100)
-      setTimeout(()=>{
-        self.serverMsg += '.'
-      },2400)
-      setTimeout(()=>{
-        self.serverMsg = JSON.parse(event.data).message
-      },2700)
+      // self.serverMsg = 'Typing'
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },300)
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },600)
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },900)
+      // setTimeout(()=>{
+      //   self.serverMsg = 'Typing'
+      // },1500)
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },1800)
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },2100)
+      // setTimeout(()=>{
+      //   self.serverMsg += '.'
+      // },2400)
+      // setTimeout(()=>{
+      //   self.serverMsg = JSON.parse(event.data).message
+      // },2700)
+      self.serverMsg.push(JSON.parse(event.data).message)
       
       console.log(self.serverMsg)
     }

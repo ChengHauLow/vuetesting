@@ -39,7 +39,8 @@
 
 <script>
 import MyInfo from '@/components/MyInfo.vue'
-import { createChart } from 'lightweight-charts';
+import { createChart, CrosshairMode, LineStyle, PriceScaleMode  } from 'lightweight-charts';
+// import moment from 'moment';
 export default {
   components:{
     MyInfo
@@ -83,11 +84,16 @@ export default {
       latestData:[],
       myChart0:document.getElementById('chart'),
       myChart:null,
-      chartOptions:{ layout: { textColor: 'black', background: { type: 'solid', color: 'white' } } },
+      chartOptions:{ layout: { textColor: 'black', background: { type: 'solid', color: 'white' } }, crosshair:{
+        mode: CrosshairMode.Normal
+      } },
       areaSeries:null,
       seriesOption:{
         lineColor: '#2962FF', topColor: '#2962FF',
         bottomColor: 'rgba(41, 98, 255, 0.28)',
+        priceLineVisible: true,
+        priceScaleId:'right',
+        priceScaleMode:2,
       },
       candleOption:{
           upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
@@ -229,10 +235,37 @@ export default {
     this.myChart0 = document.getElementById('chart')
     this.myChart = createChart(this.myChart0, this.chartOptions);
     this.areaSeries = this.myChart.addAreaSeries(this.seriesOption);
+    // this.areaSeries.priceScale().applyOptions({
+    //     autoScale: true, // disables auto scaling based on visible content
+    //     scaleMargins: {
+    //       top: 0.1,
+    //       bottom: 0.2,
+    //     },
+    //   });
     this.areaSeries.setData(this.seriesData)
+    this.areaSeries.priceScale().applyOptions({
+      mode: PriceScaleMode.Percentage
+    });
+    this.areaSeries.createPriceLine({
+        price: 22.00,
+        color: 'green',
+        lineWidth: 2,
+        lineStyle: LineStyle.Dotted,
+        axisLabelVisible: true,
+        title: 'Yesterday Close',
+    });
     // this.candlestickSeries = this.myChart.addCandlestickSeries(this.candleOption);
     // this.candlestickSeries.setData(this.candleData);
+    // this.myChart.timeScale().lockVisibleTimeRangeOnResize();
+    // this.myChart.timeScale().shiftVisibleRangeOnNewBar()
     this.myChart.timeScale().fitContent();
+    this.myChart.timeScale().applyOptions({
+      lockVisibleTimeRangeOnResize: false,
+      borderVisible: true,
+      timeVisible: false,
+      ticksVisible: true,
+    });
+    // this.myChart.timeScale().setVisibleLogicalRange({ from: moment("2016-12-31").unix(), to: moment("2200-12-31").unix() });
   }
 }
 </script>

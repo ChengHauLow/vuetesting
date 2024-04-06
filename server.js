@@ -3,7 +3,6 @@ const wss = new Websocket.Server({port:3030})
 const moment = require('moment');
 let dateNow = '2018-12-31';
 let nextDate = ''
-let valueNow = 22.67;
 let nextValue = 0
 const checkCMD = (cmd, data)=>{
   let reply = {
@@ -28,17 +27,17 @@ const checkCMD = (cmd, data)=>{
     case "stock_index":
       nextDate = moment(dateNow).add(1,'day').format('YYYY-MM-DD')
       if(Math.random()*10 > 5){
-        nextValue = valueNow*(1+Math.random())
+        nextValue = (Math.random()*40)*(-1) + 10
       }
       if(Math.random()*10 < 5){
-        nextValue = valueNow*(-1+Math.random())
+        nextValue = (Math.random()*40)*1
       }
+      // console.log(nextValue);
       reply = {
         type: 3,
         data: [{ time: nextDate, value: nextValue }]
       }
       dateNow = nextDate;
-      valueNow = nextValue;
       break;
   
     default:
@@ -57,7 +56,7 @@ wss.on('connection', function connection(ws){
         setInterval(()=>{
           let reply = checkCMD(cmd, data)
           ws.send(JSON.stringify(reply))
-        }, 1000)
+        }, 2000)
       }
       let reply = checkCMD(cmd, data)
       ws.send(JSON.stringify(reply))
